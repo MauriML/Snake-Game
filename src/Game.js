@@ -7,9 +7,9 @@
 
 import { CONFIG } from './config.js';
 
-export class Game extends EventTarget {
+export class Game {
   constructor(inputManager, skinManager) {
-    super(); // EventTarget gives us dispatchEvent / addEventListener
+    this._listeners = {}; // EventTarget gives us dispatchEvent / addEventListener
     this._input = inputManager;
     this._skins = skinManager;
 
@@ -213,7 +213,13 @@ export class Game extends EventTarget {
     });
   }
 
+  addEventListener(event, callback) {
+    if (!this._listeners[event]) this._listeners[event] = [];
+    this._listeners[event].push(callback);
+  }
+
   _emit(eventName, detail = {}) {
-    this.dispatchEvent(new CustomEvent(eventName, { detail }));
+    const handlers = this._listeners[eventName] || [];
+    handlers.forEach(cb => cb({ detail }));
   }
 }
