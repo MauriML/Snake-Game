@@ -2,39 +2,66 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.3.0/css/all.min.css">
-    <link rel="stylesheet" href="style.css">
-    <title>Snake Game</title>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.3.0/css/all.min.css">
+  <link rel="stylesheet" href="style.css">
+
+  <!-- PWA (Punto 5 — se completa después) -->
+  <!-- <link rel="manifest" href="manifest.json"> -->
+
+  <title>Snake — Pro Edition</title>
 </head>
 
 <body>
 
-    <div class="wrapper">
-        <div class="game-details">
-            <span class="score">Score: 0</span>
-            <span class="high-score">High Score: 0</span>
+  <div class="wrapper">
+
+    <!-- HUD: score, speed bar -->
+    <div class="game-details">
+      <span class="score">Score: 0</span>
+      <div class="speed-container" title="Speed">
+        <span class="speed-label">SPD</span>
+        <div id="speed-bar">
+          <div id="speed-fill"></div>
         </div>
-
-        <div class="play-board"></div>
-
-        <div class="controls">
-            <i data-key="ArrowLeft" class="fa-solid 
-            fa-arrow-left-long"></i>
-            <i data-key="ArrowUp" class="fa-solid 
-            fa-arrow-up-long"></i>
-            <i data-key="ArrowRight" class="fa-solid 
-            fa-arrow-right-long"></i>
-            <i data-key="ArrowDown" class="fa-solid 
-            fa-arrow-down-long"></i>
-        </div>
-
+      </div>
+      <span class="high-score">Best: 0</span>
     </div>
-    
 
-    <script src="index.js"></script>
+    <!-- Canvas replaces the grid-div. All drawing happens here. -->
+    <div class="canvas-wrapper">
+      <canvas id="gameCanvas"></canvas>
+
+      <!-- Overlay: start screen / game over / pause
+           Sits on top of canvas via CSS position:absolute -->
+      <div id="game-overlay">
+        <h1 id="overlay-title">SNAKE</h1>
+        <p id="overlay-subtitle">Use arrow keys or swipe to move</p>
+
+        <!-- Skin selector — rendered by UIManager -->
+        <div id="skin-panel"></div>
+
+        <button id="start-btn">START GAME</button>
+      </div>
+    </div>
+
+    <!-- Unlock notification banner -->
+    <div id="unlock-banner"></div>
+
+    <!-- Mobile arrow controls -->
+    <div class="controls">
+      <i data-key="ArrowLeft"  class="fa-solid fa-arrow-left-long"></i>
+      <i data-key="ArrowUp"    class="fa-solid fa-arrow-up-long"></i>
+      <i data-key="ArrowRight" class="fa-solid fa-arrow-right-long"></i>
+      <i data-key="ArrowDown"  class="fa-solid fa-arrow-down-long"></i>
+    </div>
+
+  </div>
+
+  <!-- type="module" enables ES6 imports and defers automatically -->
+  <script type="module" src="src/main.js"></script>
+
 </body>
-
 </html>
