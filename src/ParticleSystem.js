@@ -1,10 +1,3 @@
-// ParticleSystem.js — Visual effects engine
-// Completely decoupled from game logic. Game.js fires events; this class reacts.
-//
-// DESIGN DECISION: We store particles in a plain array and update them each
-// frame in the render loop. This avoids setTimeout/setInterval per-particle
-// which would create garbage collection pressure at high scores.
-
 import { CONFIG } from './config.js';
 
 export class ParticleSystem {

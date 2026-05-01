@@ -1,6 +1,3 @@
-// UIManager.js — All DOM manipulation. No canvas, no game logic.
-// Listens to Game events and updates the HTML layer accordingly.
-
 import { CONFIG } from './config.js';
 
 export class UIManager {

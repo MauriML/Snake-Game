@@ -1,13 +1,3 @@
-// Renderer.js — Everything visual. No game logic here.
-// Subscribes to Game events and translates state into pixels.
-//
-// DRAWING ORDER (back to front — painter's algorithm):
-//   1. Background grid
-//   2. Food (with glow)
-//   3. Snake body
-//   4. Snake head
-//   5. Particles (on top of everything)
-
 import { CONFIG } from './config.js';
 
 export class Renderer {

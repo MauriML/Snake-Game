@@ -1,5 +1,3 @@
-// InputManager.js — All input handling lives here, Game.js never touches events
-
 export class InputManager {
   constructor() {
     this._queue = [];
@@ -15,7 +13,6 @@ export class InputManager {
     this._canvas = null;
 
     this._bindKeyboard();
-    this._bindButtons();
   }
 
   // Llamado desde main.js después de crear el canvas
@@ -23,6 +20,7 @@ export class InputManager {
   setCanvas(canvas) {
     this._canvas = canvas;
     this._bindTouch(canvas);
+    this._bindButtons(); // rebindear acá garantiza que el DOM ya existe
   }
 
   // ─── KEYBOARD ──────────────────────────────────────────────────────────────

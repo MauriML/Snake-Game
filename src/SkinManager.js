@@ -1,10 +1,3 @@
-// SkinManager.js — Manages skin unlocking, selection, and persistence
-//
-// WHY SEPARATE FROM GAME.JS?
-// Skin state is orthogonal to game state. A player's unlocked skins persist
-// across sessions; game state resets every round. Keeping them separate means
-// we can save/load skins independently and Game.js stays focused on rules.
-
 import { CONFIG } from './config.js';
 
 export class SkinManager {

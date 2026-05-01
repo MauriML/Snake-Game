@@ -1,6 +1,3 @@
-// config.js — Single source of truth for all game constants
-// Changing a value here propagates everywhere. No magic numbers in logic files.
-
 export const CONFIG = {
   // Board
   GRID_SIZE: 20,       // number of cells per row/column

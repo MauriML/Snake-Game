@@ -1,10 +1,3 @@
-// Game.js — Pure game logic. No DOM, no Canvas, no events.
-// This class only knows about game rules and state.
-// It emits events that other systems (Renderer, ParticleSystem) subscribe to.
-//
-// STATE MACHINE:
-//   idle → playing → paused → gameOver → idle (new game)
-
 import { CONFIG } from './config.js';
 
 export class Game {
