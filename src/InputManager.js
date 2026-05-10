@@ -1,32 +1,37 @@
 export class InputManager {
   constructor() {
+    // Queue holds pending direction changes. Max length = 2 to prevent
+    // "buffering around corners" exploit where players queue 5 moves ahead.
     this._queue = [];
     this._MAX_BUFFER = 2;
+
+    // Track last confirmed direction to validate new inputs
+    // (prevents reversing into yourself from buffered inputs)
     this._lastDirection = { x: 0, y: 0 };
 
+    // Touch tracking for swipe detection
     this._touchStartX = 0;
     this._touchStartY = 0;
-    this._SWIPE_THRESHOLD = 30;
+    this._SWIPE_THRESHOLD = 30; // min px movement to count as swipe
 
-    // Canvas se asigna después via setCanvas()
-    // No podemos bindear touch al document o Safari cancela los clicks de botones
-    this._canvas = null;
-
-    this._bindKeyboard();
+    this._bindEvents();
   }
 
-  // Llamado desde main.js después de crear el canvas
-  // Así los eventos touch quedan SOLO sobre el área de juego
-  setCanvas(canvas) {
-    this._canvas = canvas;
-    this._bindTouch(canvas);
-    this._bindButtons(); // rebindear acá garantiza que el DOM ya existe
-  }
-
-  // ─── KEYBOARD ──────────────────────────────────────────────────────────────
-
-  _bindKeyboard() {
+  _bindEvents() {
     document.addEventListener('keydown', e => this._handleKey(e));
+
+    // Listen on both the canvas and the document to catch all touch scenarios
+    const touchTargets = [document, document.getElementById('gameCanvas')].filter(Boolean);
+    touchTargets.forEach(target => {
+      target.addEventListener('touchstart', e => this._handleTouchStart(e), { passive: false });
+      target.addEventListener('touchend',   e => this._handleTouchEnd(e),   { passive: true });
+    });
+
+    document.querySelectorAll('.controls i').forEach(btn => {
+      btn.addEventListener('click', () => {
+        this._handleKey({ key: btn.dataset.key });
+      });
+    });
   }
 
   _handleKey(e) {
@@ -44,6 +49,7 @@ export class InputManager {
     const dir = keyToDir[e.key];
     if (!dir) return;
 
+    // Prevent page scrolling with arrow keys during gameplay
     if (['ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].includes(e.key)) {
       e.preventDefault();
     }
@@ -51,56 +57,47 @@ export class InputManager {
     this._enqueue(dir);
   }
 
-  // ─── TOUCH — solo sobre el canvas ─────────────────────────────────────────
-  // Clave: escuchar en canvas en vez de document evita que preventDefault()
-  // cancele los clicks sobre el botón START en Safari iOS
-
-  _bindTouch(canvas) {
-    canvas.addEventListener('touchstart', e => {
-      this._touchStartX = e.touches[0].clientX;
-      this._touchStartY = e.touches[0].clientY;
-      e.preventDefault(); // seguro acá — solo cancela scroll sobre el canvas
-    }, { passive: false });
-
-    canvas.addEventListener('touchend', e => {
-      const dx = e.changedTouches[0].clientX - this._touchStartX;
-      const dy = e.changedTouches[0].clientY - this._touchStartY;
-      const absDx = Math.abs(dx);
-      const absDy = Math.abs(dy);
-
-      if (Math.max(absDx, absDy) < this._SWIPE_THRESHOLD) return;
-
-      const dir = absDx > absDy
-        ? (dx > 0 ? { x: 1, y: 0 } : { x: -1, y: 0 })
-        : (dy > 0 ? { x: 0, y: 1 } : { x: 0, y: -1 });
-
-      this._enqueue(dir);
-    }, { passive: true });
+  _handleTouchStart(e) {
+    this._touchStartX = e.touches[0].clientX;
+    this._touchStartY = e.touches[0].clientY;
+    e.preventDefault(); // kill 300ms tap delay
   }
 
-  // ─── BOTONES MOBILE ────────────────────────────────────────────────────────
+  _handleTouchEnd(e) {
+    const dx = e.changedTouches[0].clientX - this._touchStartX;
+    const dy = e.changedTouches[0].clientY - this._touchStartY;
+    const absDx = Math.abs(dx);
+    const absDy = Math.abs(dy);
 
-  _bindButtons() {
-    document.querySelectorAll('.controls i').forEach(btn => {
-      btn.addEventListener('click', () => {
-        this._handleKey({ key: btn.dataset.key });
-      });
-    });
+    if (Math.max(absDx, absDy) < this._SWIPE_THRESHOLD) return;
+
+    const dir = absDx > absDy
+      ? (dx > 0 ? { x: 1, y: 0 } : { x: -1, y: 0 })
+      : (dy > 0 ? { x: 0, y: 1 } : { x: 0, y: -1 });
+
+    this._enqueue(dir);
   }
-
-  // ─── BUFFER ────────────────────────────────────────────────────────────────
 
   _enqueue(dir) {
+    // Check against the LAST item in the buffer (not current velocity)
+    // so that a RIGHT → DOWN sequence doesn't get filtered out
     const lastQueued = this._queue[this._queue.length - 1] || this._lastDirection;
 
+    // Reject 180° reversal — you can't go right if heading left, etc.
     if (dir.x !== 0 && dir.x === -lastQueued.x) return;
     if (dir.y !== 0 && dir.y === -lastQueued.y) return;
+
+    // Reject duplicate consecutive inputs (holding a key floods events)
     if (dir.x === lastQueued.x && dir.y === lastQueued.y) return;
+
+    // Enforce buffer cap
     if (this._queue.length >= this._MAX_BUFFER) return;
 
     this._queue.push(dir);
   }
 
+  // Called by Game.js once per tick to consume the next buffered direction.
+  // Returns the direction object or null if nothing is queued.
   consume() {
     if (this._queue.length === 0) return null;
     const dir = this._queue.shift();
@@ -108,6 +105,7 @@ export class InputManager {
     return dir;
   }
 
+  // Called by Game.js when a new game starts to reset state
   reset() {
     this._queue = [];
     this._lastDirection = { x: 0, y: 0 };
