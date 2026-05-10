@@ -20,12 +20,18 @@ export class InputManager {
   _bindEvents() {
     document.addEventListener('keydown', e => this._handleKey(e));
 
-    // Listen on both the canvas and the document to catch all touch scenarios
-    const touchTargets = [document, document.getElementById('gameCanvas')].filter(Boolean);
-    touchTargets.forEach(target => {
-      target.addEventListener('touchstart', e => this._handleTouchStart(e), { passive: false });
-      target.addEventListener('touchend',   e => this._handleTouchEnd(e),   { passive: true });
-    });
+    const canvas = document.getElementById('gameCanvas');
+    if (canvas) {
+      canvas.addEventListener('touchstart', e => this._handleTouchStart(e), { passive: false });
+      canvas.addEventListener('touchend',   e => this._handleTouchEnd(e),   { passive: true });
+    }
+
+    // Fallback: listen on document too but WITHOUT preventDefault
+    document.addEventListener('touchstart', e => {
+      this._touchStartX = e.touches[0].clientX;
+      this._touchStartY = e.touches[0].clientY;
+    }, { passive: true });
+    document.addEventListener('touchend', e => this._handleTouchEnd(e), { passive: true });
 
     document.querySelectorAll('.controls i').forEach(btn => {
       btn.addEventListener('click', () => {
