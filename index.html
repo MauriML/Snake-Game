@@ -7,10 +7,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.3.0/css/all.min.css">
   <link rel="stylesheet" href="style.css">
-
-  <!-- PWA (Punto 5 — se completa después) -->
-  <!-- <link rel="manifest" href="manifest.json"> -->
-
   <title>Snake — Pro Edition</title>
 </head>
 
@@ -18,39 +14,58 @@
 
   <div class="wrapper">
 
-    <!-- HUD: score, speed bar -->
+    <!-- HUD -->
     <div class="game-details">
       <span class="score">Score: 0</span>
       <div class="speed-container" title="Speed">
         <span class="speed-label">SPD</span>
-        <div id="speed-bar">
-          <div id="speed-fill"></div>
-        </div>
+        <div id="speed-bar"><div id="speed-fill"></div></div>
       </div>
       <span class="high-score">Best: 0</span>
     </div>
 
-    <!-- Canvas replaces the grid-div. All drawing happens here. -->
+    <!-- Canvas -->
     <div class="canvas-wrapper">
       <canvas id="gameCanvas"></canvas>
 
-      <!-- Overlay: start screen / game over / pause
-           Sits on top of canvas via CSS position:absolute -->
+      <!-- Overlay: title + two-column body -->
       <div id="game-overlay">
-        <h1 id="overlay-title">SNAKE</h1>
-        <p id="overlay-subtitle">Use arrow keys or swipe to move</p>
 
-        <!-- Skin selector — rendered by UIManager -->
+        <!-- Row 1: title (spans both columns) -->
+        <div class="overlay-header">
+          <h1 id="overlay-title">SNAKE</h1>
+          <p id="overlay-subtitle">Use arrow keys or swipe to move<br><small>Press P to pause</small></p>
+        </div>
+
+        <!-- Row 2 left: leaderboard -->
+        <div id="leaderboard"></div>
+
+        <!-- Row 2 right: skins (rendered by UIManager) -->
         <div id="skin-panel"></div>
 
+        <!-- Row 3: name input (shown only on game over) -->
+        <div id="name-input-wrapper" style="display:none">
+          <input
+            id="player-name"
+            type="text"
+            maxlength="20"
+            placeholder="Your name"
+            autocomplete="off"
+            spellcheck="false"
+          />
+          <button id="save-score-btn">Save Score</button>
+        </div>
+
+        <!-- Row 4: action button -->
         <button id="start-btn">START GAME</button>
+
       </div>
     </div>
 
-    <!-- Unlock notification banner -->
+    <!-- Unlock banner -->
     <div id="unlock-banner"></div>
 
-    <!-- Mobile arrow controls -->
+    <!-- Mobile controls -->
     <div class="controls">
       <i data-key="ArrowLeft"  class="fa-solid fa-arrow-left-long"></i>
       <i data-key="ArrowUp"    class="fa-solid fa-arrow-up-long"></i>
@@ -60,7 +75,6 @@
 
   </div>
 
-  <!-- type="module" enables ES6 imports and defers automatically -->
   <script type="module" src="src/main.js"></script>
 
 </body>
